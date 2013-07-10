@@ -1,0 +1,44 @@
+<script src='socket.io/socket.io.js'></script>
+<script>
+</script>
+<script>
+onload=function(){
+  ws=new WebSocket('ws://'+location.hostname+':4568');
+  ws.onclose=function(){
+    log('wsclosed');
+  }
+  ws.onmessage=function(msg){
+    log(msg.data);
+  }
+  socket=io.connect(location.href)
+  socket.on('connect',function(){
+    log('connected');
+  })
+  socket.on('disconnect',function(){
+    log('disconnected');
+  })
+  socket.on('data',function(data){
+    log(data);
+  })
+}
+function send(){
+  try{
+    var http=new XMLHttpRequest();
+    var curlport=5678;
+    var url=location.protocol+'//'+location.hostname+':'+curlport;
+    http.open('get',url,true);
+    http.send();
+  }catch(e){console.log(e)}
+}
+function log(msg){
+  var div=document.createElement('div');
+  div.textContent=JSON.stringify(msg);
+  var status=document.getElementById('status');
+  status.appendChild(div);
+  if(status.childNodes.length>20){
+    status.removeChild(status.firstChild)
+  }
+}
+</script>
+<form onsubmit="send();return false;"><input type=submit></form>
+<div id='status'></div>
