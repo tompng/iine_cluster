@@ -14,7 +14,10 @@ function master(){
   var counter=Counter.create(10);
   counter.onfire=function(count){
     for(var i=0;i<workers.length;i++){
-      workers[i].send({data:count});
+      try{
+        var worker=workers[i];
+        if(worker)worker.send({data:count})
+      }catch(e){};
     }
   }
   function exec(index,option){
@@ -23,6 +26,7 @@ function master(){
     worker.send(option);
     worker.on('message',function(count){counter.increment(count)});
     worker.on('exit',function(){
+      workers[index]=null;
       setTimeout(function(){
         exec(index,option);
       },1000);
@@ -48,5 +52,5 @@ function worker(){
       w.broadcast(msg.data);
     }
   })
-  setTimeout(function(){process.exit()},30000+30000*Math.random());
+  //setTimeout(function(){process.exit()},1000+3000*Math.random());
 }

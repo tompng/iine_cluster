@@ -1,11 +1,11 @@
 var http=require('http');
 var express=require('express');
 var socketio=require('socket.io');
-var app=express()
+var app=express();
 var io;
 function start(port){
   var server=http.createServer(app).listen(port);
-  io=socketio.listen(server);
+  io=socketio.listen(server,{'log level':1});
   app.get('/',function(req,res){
     res.sendfile('./index.html');
   });
