@@ -2,15 +2,23 @@
 <script>
 </script>
 <script>
+
 onload=function(){
-  ws=new WebSocket('ws://'+location.hostname+':4568');
-  ws.onclose=function(){
-    log('wsclosed');
+  function wsstart(t){
+    if(!t)t=0;
+    var ws=new WebSocket('ws://'+location.hostname+':4568');
+    ws.onopen=function(){log('wsconnected');t=0;}
+    ws.onclose=function(){
+      log('wsdisconnected');
+      var timeout=60*1000*(1<<t)/(240+(1<<t))
+      setTimeout(function(){wsstart(t+1)},timeout);
+    }
+    ws.onmessage=function(msg){
+      log('ws'+msg.data);
+    }
   }
-  ws.onmessage=function(msg){
-    log(msg.data);
-  }
-  socket=io.connect(location.href)
+  wsstart();
+  socket=io.connect(location.href);
   socket.on('connect',function(){
     log('connected');
   })
@@ -18,7 +26,7 @@ onload=function(){
     log('disconnected');
   })
   socket.on('data',function(data){
-    log(data);
+    log('io'+data);
   })
 }
 function send(){
